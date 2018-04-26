@@ -1,0 +1,2 @@
+# GalGen
+A galaxy generator
