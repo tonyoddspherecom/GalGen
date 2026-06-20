@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>UniverseGen.Demo</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UniverseGen\UniverseGen.csproj" />
+    <ProjectReference Include="..\UniverseGen.Rendering\UniverseGen.Rendering.csproj" />
+    <ProjectReference Include="..\UniverseGen.Rendering.GDI\UniverseGen.Rendering.GDI.csproj" />
+  </ItemGroup>
+  <!--
+    Build UniverseGen.Math (C++ DLL) first, then copy it here.
+    Adjust the source path if your C++ output dir differs.
+  -->
+  <Target Name="CopyNativeDll" AfterTargets="Build">
+    <ItemGroup>
+      <NativeDll Include="$(SolutionDir)x64\$(Configuration)\UniverseGen.Math.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NativeDll)" DestinationFolder="$(OutDir)"
+          Condition="Exists('%(NativeDll.FullPath)')" />
+  </Target>
+</Project>
