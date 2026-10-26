@@ -1,4 +1,3 @@
-using UniverseGen.Interop;
 using UniverseGen.Models;
 
 namespace UniverseGen.Generation;
@@ -9,9 +8,8 @@ public class GalaxyGenerator
 
     public Galaxy Generate(GalaxyParams parms, int resolution = DefaultResolution)
     {
-        var mp      = GalaxyMathParams.From(parms);
         var density = new float[resolution * resolution];
-        MathDll.GenerateGalaxyDensityMap(ref mp, density, resolution, resolution);
+        GalaxyMath.For(parms).DensityMap(density, resolution, resolution);
         var galaxy     = new Galaxy(parms.Clone(), density, resolution, resolution);
         var clusterMap = new GalaxyClusterMap(galaxy);
         var blackHole  = new GalacticBlackHole(parms);
@@ -26,25 +24,23 @@ public class GalaxyGenerator
     /// </summary>
     public Galaxy GenerateSideView(GalaxyParams parms, int width = 512, int height = 128)
     {
-        var mp      = GalaxyMathParams.From(parms);
         var density = new float[width * height];
-        MathDll.GenerateGalaxySideViewDensityMap(ref mp, density, width, height);
+        GalaxyMath.For(parms).SideView(density, width, height);
         return new Galaxy(parms.Clone(), density, width, height);
     }
 
     /// <summary>
     /// Generates a zoomed view of a sub-region of the galaxy.
     /// region is in normalised [0,1] coordinates relative to the full galaxy extent.
-    /// The C++ layer boosts noise scale proportionally so the result shows genuine
-    /// new structure rather than just a magnified version of the top-level image.
+    /// Noise scale is boosted proportionally so the result shows genuine new structure
+    /// rather than just a magnified version of the top-level image.
     /// </summary>
     public Galaxy GenerateZoomedView(GalaxyParams parms, RegionF region,
                                      int zoomLevel, int resolution = DefaultResolution)
     {
-        var mp      = GalaxyMathParams.From(parms);
         var density = new float[resolution * resolution];
-        MathDll.GenerateGalaxyDensityMapRegion(ref mp, density, resolution, resolution,
-                                               region.X, region.Y, region.Width, region.Height);
+        GalaxyMath.For(parms).DensityMap(density, resolution, resolution,
+                                         region.X, region.Y, region.Width, region.Height);
         return new Galaxy(parms.Clone(), density, resolution, resolution, region, zoomLevel);
     }
 }

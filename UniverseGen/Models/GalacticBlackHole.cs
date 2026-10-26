@@ -10,7 +10,7 @@ namespace UniverseGen.Models;
 /// so every galaxy has a unique SMBH without changing the overall distribution.
 ///
 /// Position is always the galactic origin (0, 0, 0) in normalised space.
-/// 1 normalised unit = 50,000 light-years.
+/// 1 normalised unit = RadiusLightYears (50,000 light-years by default).
 /// </summary>
 public sealed class GalacticBlackHole
 {

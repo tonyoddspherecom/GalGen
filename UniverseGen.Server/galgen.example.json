@@ -1,0 +1,68 @@
+// GalGen server config. Copy this to galgen.json beside the server (or pass --config <file>), keep
+// what you need, and start it. A misspelt setting stops the server with what's wrong, rather than
+// being quietly ignored. Comments and trailing commas are fine.
+{
+  // What the server calls itself to clients.
+  "name": "My GalGen server",
+
+  // The binary protocol over TCP: the fastest way for a game to talk to it (GalaxyClient.Tcp).
+  "tcp": { "enabled": true, "address": "0.0.0.0", "port": 24700, "maxConnections": 1000 },
+
+  // HTTP: the binary protocol at {prefix}/rpc, and readable JSON and PNG endpoints beside it
+  // (/galaxy, /galaxy/{id}, /galaxy/{id}/map, /galaxy/{id}/stars, ...), plus /health.
+  "http": {
+    "enabled": false,
+    "urls": ["http://0.0.0.0:24701"],
+    "prefix": "/galaxy",
+    // Web pages allowed to call it from a browser: "*" for any, or a list of origins.
+    "corsOrigins": [],
+    "readableEndpoints": true,
+  },
+
+  // What any one request may ask for, and how much the server keeps cached, per galaxy.
+  "limits": {
+    "chunkCacheCapacity": 65536,
+    "systemCacheCapacity": 8192,
+    "mapCacheCapacity": 64,
+    "maxChunksPerRequest": 4096,
+    "maxQueryChunks": 250000,
+    "maxResults": 20000,
+    "maxMapPixels": 16777216,
+    "maxSystemsPerQuery": 5000,
+    "maxPickAttempts": 1024,
+    "parallelism": 8,
+  },
+
+  // How much work each client may ask for: cost units a second (about one per chunk searched or sent,
+  // one per 16,384 map pixels, one per star, system or place), and how much it may save up for a burst.
+  // 0 is no limit: right for a server only your own game talks to; set one for a public server.
+  "rateLimit": { "costPerSecond": 0, "costBurst": 0 },
+
+  // Whether clients may ask for cache and request counts.
+  "exposeStats": true,
+
+  // Every request on the console, rather than a summary each minute.
+  "logRequests": false,
+
+  // The galaxies, by id. Give each a code (from the GalGen demo, or `galgen-server inspect`) or its params.
+  "galaxies": [
+    {
+      // A Milky Way: the default settings at the default size, about 180 billion stars.
+      "id": "milkyway",
+      "name": "The Galaxy",
+      "description": "A barred spiral, 100,000 light years across.",
+      "params": { "type": "Spiral", "arms": 4, "barStrength": 0.4, "seed": 12345 },
+    },
+    {
+      // A small galaxy that's flat all over, of about 3 million stars: easy to read top-down, quick to search.
+      "id": "small",
+      "name": "The Reach",
+      "params": {
+        "type": "Spiral", "age": "Mature", "arms": 3, "seed": 2026,
+        "radiusLightYears": 3000, "diskThickness": 0.3, "bulgeThickness": 0.15, "haloStrength": 0, "starDensity": 0.35,
+      },
+      // Its own limits and chunking, if it needs them (chunkLightYears and maxStarsPerChunk change the galaxy itself).
+      "options": { "chunkLightYears": 10, "maxStarsPerChunk": 200 },
+    },
+  ],
+}

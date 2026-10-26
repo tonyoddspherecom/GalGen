@@ -8,4 +8,9 @@
     <AssemblyName>UniverseGen</AssemblyName>
     <RootNamespace>UniverseGen</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- The service rebuilds systems and chunks it receives over the wire, which have internal constructors. -->
+    <InternalsVisibleTo Include="UniverseGen.Service" />
+    <InternalsVisibleTo Include="UniverseGen.Tests" />
+  </ItemGroup>
 </Project>

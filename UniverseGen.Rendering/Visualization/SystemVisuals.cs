@@ -122,18 +122,5 @@ public static class SystemVisuals
     ///
     /// Example outputs: <c>"HD 042761"</c>, <c>"SAO 836205"</c>.
     /// </summary>
-    public static string StarDesignation(Star star)
-    {
-        ulong h = (ulong)(star.X * 73856093f)
-                ^ (ulong)(star.Y * 19349663f)
-                ^ (ulong)(star.Z * 83492791f);
-        h  = (h ^ (h >> 30)) * 0xbf58476d1ce4e5b9UL;
-        h ^= h >> 27;
-        int    num    = (int)(h & 0xFFFFF);       // 0 – 1,048,575
-        string prefix = (int)((h >> 20) & 3) switch
-        {
-            0 => "HD", 1 => "HIP", 2 => "SAO", _ => "TYC",
-        };
-        return $"{prefix} {num:D6}";
-    }
+    public static string StarDesignation(Star star) => UniverseGen.Generation.StarNames.Designation(star);
 }

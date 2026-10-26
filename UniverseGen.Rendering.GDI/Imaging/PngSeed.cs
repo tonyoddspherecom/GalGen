@@ -12,7 +12,9 @@ namespace UniverseGen.Imaging;
 public static class PngSeed
 {
     private static readonly byte[] Magic   = [0x55, 0x47, 0x53, 0x44]; // "UGSD"
-    private const           byte   Version = 3;
+    // 4 added the galaxy's scale (radius, disk thickness, star density) and FeatureDensity; 5 the model,
+    // bulge thickness and halo. Versions 3 and 4 still load, as the Classic galaxies they were.
+    private const           byte   Version = 5;
 
     // ── public API ──────────────────────────────────────────────────────────
 
@@ -60,6 +62,13 @@ public static class PngSeed
         w.Write(p.BarStrength);
         w.Write(p.BarLength);
         w.Write((int)p.Type);
+        w.Write(p.RadiusLightYears);
+        w.Write(p.DiskThickness);
+        w.Write(p.StarDensity);
+        w.Write(p.FeatureDensity);
+        w.Write((int)p.Model);
+        w.Write(p.BulgeThickness);
+        w.Write(p.HaloStrength);
         return ms.ToArray();
     }
 
@@ -70,9 +79,9 @@ public static class PngSeed
         if (!r.ReadBytes(4).SequenceEqual(Magic))
             throw new InvalidDataException("Not a valid galaxy seed image.");
         byte ver = r.ReadByte();
-        if (ver != Version)
+        if (ver is not (3 or 4 or Version))
             throw new InvalidDataException($"Unsupported seed version {ver}.");
-        return new GalaxyParams
+        var p = new GalaxyParams
         {
             Arms          = r.ReadInt32(),
             ArmTightness  = r.ReadSingle(),
@@ -87,7 +96,22 @@ public static class PngSeed
             BarStrength = r.ReadSingle(),
             BarLength   = r.ReadSingle(),
             Type        = (GalaxyType)r.ReadInt32(),
+            Model       = GalaxyModel.Classic,
         };
+        if (ver >= 4)
+        {
+            p.RadiusLightYears = r.ReadSingle();
+            p.DiskThickness    = r.ReadSingle();
+            p.StarDensity      = r.ReadSingle();
+            p.FeatureDensity   = r.ReadInt32();
+        }
+        if (ver >= 5)
+        {
+            p.Model          = (GalaxyModel)r.ReadInt32();
+            p.BulgeThickness = r.ReadSingle();
+            p.HaloStrength   = r.ReadSingle();
+        }
+        return p;
     }
 
     // ── steganography ────────────────────────────────────────────────────────

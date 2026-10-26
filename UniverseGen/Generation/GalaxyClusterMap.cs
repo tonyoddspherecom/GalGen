@@ -16,7 +16,7 @@ public sealed class GalaxyClusterMap
 {
     public IReadOnlyList<GalaxyCluster> Clusters { get; }
 
-    // Influence radii in galaxy normalised units (1 unit = 50,000 ly)
+    // Influence radii in galaxy normalised units (1 unit = RadiusLightYears: 50,000 ly by default)
     private const float NebRadiusNorm  = 0.010f;   // ~500 ly
     private const float OpenRadiusNorm = 0.005f;   // ~250 ly
     private const float GlobRadiusNorm = 0.007f;   // ~350 ly
@@ -173,7 +173,7 @@ public sealed class GalaxyClusterMap
         if (count <= 0) return result;
 
         ulong salt  = 0x9876FEDC9876FEDCUL;
-        float diskH = 0.04f + (int)parms.Age * 0.02f + parms.BulgeFactor * 0.04f;
+        float diskH = GalaxyMath.ClusterDiskHeight(parms);
         int   idx   = 0;
 
         for (int attempt = 0; attempt < 200000 && result.Count < count; attempt++)
